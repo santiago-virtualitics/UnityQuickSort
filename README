@@ -1,0 +1,6 @@
+
+UNITY QUICK SORT
+by santiago v lombeyda
+2016
+
+based on quicksort from wikipedia, with added fat pivot to compensante for multiple copies

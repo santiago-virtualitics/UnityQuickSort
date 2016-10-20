@@ -133,6 +133,8 @@ public class SceneTreeManager : MonoBehaviour
 
     int qcount;
     int shortcircuitcount;
+    int maxcalls;
+
     // quicksort needs to be folded into a linear structure
     bool QuickSort(int i, int j)
     {
@@ -141,7 +143,7 @@ public class SceneTreeManager : MonoBehaviour
         Point2I p = QuickSortSplit(i, j);
         if (deepdebug) printdata();
         if (p == null) return true;
-        if (qcount > sizedata * sizedata)
+        if (qcount > maxcalls)
         {
             print("MAXED OUT.");
             return false;
@@ -160,6 +162,7 @@ public class SceneTreeManager : MonoBehaviour
     void SortNow()
     {
         qcount = 0;
+        maxcalls = sizedata * sizedata * 3 / 2;
         shortcircuitcount = 0;
         if (checkIfSorted())
         {
@@ -167,15 +170,16 @@ public class SceneTreeManager : MonoBehaviour
             return;
         }
 
-        double to = Time.fixedTime;
+        double to = Time.realtimeSinceStartup;
         if (deepdebug) printdata();
-        //if (!doesNotHelp) print("start time " + to);
         QuickSort(0, sizedata - 1);
-        double tf = Time.fixedTime;
-        //if (!doesNotHelp) print("end time   " + tf);
+
+        double tf = Time.realtimeSinceStartup;
         if (deepdebug) printdata();
 
-        print("sorting " + sizedata + " took " + ((double)((int)((tf - to) * 10000.0)) / 10000.0) + "s");
+        double dt = ((double)((int)((tf - to) * 10000.0)) / 10000.0);
+
+        print("sorting " + sizedata + " took " + dt + "s which is "+((int)((1/dt)*100.0))/100.0+"fps");
         print("calls " + qcount + " with " + shortcircuitcount + " short circuits");
 
         if (checkIfSorted())

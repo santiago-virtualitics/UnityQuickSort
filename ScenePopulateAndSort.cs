@@ -34,6 +34,8 @@ public class SceneTreeManager : MonoBehaviour
     public int sizedata = 360;
     bool deepdebug = false;
     bool roundvalues = true;
+    double starttime;
+    public bool enforceTimeout = false;
 
     bool checkIfSorted()
     {
@@ -134,7 +136,7 @@ public class SceneTreeManager : MonoBehaviour
     int qcount;
     int shortcircuitcount;
     int maxcalls;
-
+    double minFPSinv = 1.0 / 48.0;
     // quicksort needs to be folded into a linear structure
     bool QuickSort(int i, int j)
     {
@@ -143,9 +145,13 @@ public class SceneTreeManager : MonoBehaviour
         Point2I p = QuickSortSplit(i, j);
         if (deepdebug) printdata();
         if (p == null) return true;
-        if (qcount > maxcalls)
+        if (enforceTimeout && qcount > maxcalls) {
+            print("Abort. Too many calls. Possible worst case.");
+            return false;
+        }
+        if (enforceTimeout && (Time.realtimeSinceStartup-starttime) > minFPSinv)
         {
-            print("MAXED OUT.");
+            print("Abort. Exceeded max allowed time.");
             return false;
         }
         if (p.i < 0) return QuickSort(p.j, j);
@@ -162,7 +168,7 @@ public class SceneTreeManager : MonoBehaviour
     void SortNow()
     {
         qcount = 0;
-        maxcalls = sizedata * sizedata * 3 / 2;
+        maxcalls = sizedata * sizedata * 2;
         shortcircuitcount = 0;
         if (checkIfSorted())
         {
@@ -171,6 +177,7 @@ public class SceneTreeManager : MonoBehaviour
         }
 
         double to = Time.realtimeSinceStartup;
+        starttime = to;
         if (deepdebug) printdata();
         QuickSort(0, sizedata - 1);
 

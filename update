@@ -1,0 +1,3 @@
+#!/usr/bin/csh
+
+cp ../QuickTests/SortTests/Assets/SceneTreeManager.cs ScenePopulateAndSort.cs
